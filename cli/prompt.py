@@ -7,8 +7,13 @@ manager = AIModelManager()
 
 
 def user_command_line_prompt():
+    """
+    Parses command-line arguments to separate the user's prompt and any additional flags.
+
+    Returns:
+        tuple: A tuple containing the user's prompt (str or None) and a list of input flags.
+    """
     args = [x for x in sys.argv]
-    manager.load()
 
     if len(args) > 1 and not args[1].startswith("--"):
         prompt_by_user = args[1]
@@ -24,6 +29,15 @@ def user_command_line_prompt():
 
 
 def last_command_line_prompt(last_number_of_commands):
+    """
+    Retrieves the last N commands from the user's bash history.
+
+    Args:
+        last_number_of_commands (int): Number of recent commands to retrieve.
+
+    Returns:
+        str: The last N commands as a single string.
+    """
     history_file = os.path.expanduser("~/.bash_history")
     with open(history_file, "r") as file:
         history_lines = file.readlines()
@@ -32,6 +46,12 @@ def last_command_line_prompt(last_number_of_commands):
 
 
 def prompt_for_llm(prompt_for_llm):
+    """
+    Sends a prompt to the selected LLM model and prints the response.
+
+    Args:
+        prompt_for_llm (str): The prompt to send to the model.
+    """
     prompt_for_llm += " give response in short form, if asked for commands then give commands and dont explain too much"
     models_api_dict = manager.load()
     model_name = models_api_dict["selected_model"] or "gemini-1.5-flash"
@@ -40,6 +60,13 @@ def prompt_for_llm(prompt_for_llm):
 
 
 def debug_last_command_line_prompt(prompt_by_user, all_input_flags):
+    """
+    Analyzes and debugs the last few command-line commands using the LLM.
+
+    Args:
+        prompt_by_user (str or None): Optional user prompt to append.
+        all_input_flags (list): List of input flags provided in the CLI.
+    """
     last_number_of_commands = (
         int(all_input_flags[2]) if len(all_input_flags) == 3 else 3
     )
@@ -60,6 +87,12 @@ def debug_last_command_line_prompt(prompt_by_user, all_input_flags):
 
 
 def handle_input_flags(all_input_flags):
+    """
+    Handles input flags such as configuring, removing, selecting, or listing models.
+
+    Args:
+        all_input_flags (list): List of input flags from the CLI.
+    """
     if all_input_flags:
         if not all_input_flags[0] == "":
             print(
@@ -89,6 +122,9 @@ def handle_input_flags(all_input_flags):
 
 
 def handle_all_quries():
+    """
+    Main logic to handle prompt input, debugging, or flag-based commands from the CLI.
+    """
     prompt_by_user, all_input_flags = user_command_line_prompt()
     if prompt_by_user:
         prompt_for_llm(prompt_by_user)
@@ -98,6 +134,9 @@ def handle_all_quries():
 
 
 def main():
+    """
+    Entry point for the CLI tool. Initializes config file or processes CLI inputs.
+    """
     if len(sys.argv) > 1 and sys.argv[1] == "--setup":
         manager.create_default_file()
     else:

@@ -1,0 +1,2 @@
+rich==14.0.0
+google-genai

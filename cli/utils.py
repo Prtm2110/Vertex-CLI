@@ -26,6 +26,6 @@ def install_requirements():
     Installs the required dependencies for the application.
     """
 
-    dependencies = ["rich", "google-genai"]
+    dependencies = ["rich==14.0.0", "google-genai"]
     for package in dependencies:
         subprocess.run([sys.executable, "-m", "pip", "install", package])

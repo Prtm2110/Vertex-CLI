@@ -1,13 +1,13 @@
 [project]
 name = "Vertex-CLI"
-version = "0.1.39"
+version = "0.1.41"
 description = "A CLI tool for debugging and generating AI outputs based on prompts"
 readme = "README.md"
 authors = [
     { name = "Pratham Hole", email = "prathamhole@gmail.com" }
 ]
 dependencies = [
-    "rich",
+    "rich==14.0.0",
 ]
 license = { text = "BSD License" }
 keywords = ["CLI", "AI", "debugging", "prompt"]

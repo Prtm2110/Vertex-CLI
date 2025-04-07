@@ -18,7 +18,7 @@ Replace `"tell me about the solar system"` with any query you like, and Vertex-C
 To install [`Vertex-CLI`](https://github.com/prtm2110/vertex-cli) from TestPyPI, use:
 
 ```bash
-pip install -i https://test.pypi.org/simple/ Vertex-CLI==0.1.37
+pip install -i https://test.pypi.org/simple/ Vertex-CLI
 tex-init
 ```
 Or install Vertex-CLI in editable mode. See the [Contributors Guide](contributors_guide.md) for details.

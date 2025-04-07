@@ -15,7 +15,7 @@ Follow these steps to get started:
 To install [`Vertex-CLI`](https://github.com/prtm2110/vertex-cli) from TestPyPI, run:
 
 ```bash
-pip install --index-url https://test.pypi.org/simple/ Vertex-CLI==0.1.39
+pip install -i https://test.pypi.org/simple/ Vertex-CLI
 ```
 
 After installation, initialize the CLI:

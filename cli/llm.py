@@ -1,5 +1,4 @@
 from google import genai
-from cli.ai_models import api_key_model_selection
 
 
 def gemini_api_output(model_name, prompt_by_user):
@@ -13,7 +12,10 @@ def gemini_api_output(model_name, prompt_by_user):
     Returns:
         str: Generated response text.
     """
-    api_key = api_key_model_selection(model_name)
+    from cli.ai_model_manager import AIModelManager
+
+    manager = AIModelManager()
+    api_key = manager.get_api_key(model_name)
 
     client = genai.Client(api_key=api_key)
     response = client.models.generate_content(model=model_name, contents=prompt_by_user)

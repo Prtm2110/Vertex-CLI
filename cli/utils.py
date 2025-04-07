@@ -29,7 +29,3 @@ def install_requirements():
     dependencies = ["rich", "google-genai"]
     for package in dependencies:
         subprocess.run([sys.executable, "-m", "pip", "install", package])
-
-    from cli.ai_models import create_json_file
-
-    create_json_file()

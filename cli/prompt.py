@@ -1,29 +1,14 @@
 import os
 import sys
-import subprocess
-from cli.ai_models import (
-    configure_model,
-    remove_model,
-    load_models_api,
-    generate_output,
-    create_json_file,
-    api_key_model_selection,
-)
+from cli.ai_model_manager import AIModelManager
 from cli.prettify_llm_output import prettify_llm_output
-import cli.ai_models as ai_models
+
+manager = AIModelManager()
 
 
 def user_command_line_prompt():
-    """
-    Parses command-line arguments provided by the user.
-
-    Returns:
-        tuple: A tuple containing:
-            - prompt_by_user (str or None): The user's prompt, if provided.
-            - all_input_flags (list): A list of input flags provided by the user.
-    """
     args = [x for x in sys.argv]
-    load_models_api()
+    manager.load()
 
     if len(args) > 1 and not args[1].startswith("--"):
         prompt_by_user = args[1]
@@ -39,15 +24,6 @@ def user_command_line_prompt():
 
 
 def last_command_line_prompt(last_number_of_commands):
-    """
-    Retrieves the last N commands from the user's shell history.
-
-    Args:
-        last_number_of_commands (int): The number of recent commands to retrieve.
-
-    Returns:
-        str: A string containing the last N commands.
-    """
     history_file = os.path.expanduser("~/.bash_history")
     with open(history_file, "r") as file:
         history_lines = file.readlines()
@@ -56,21 +32,10 @@ def last_command_line_prompt(last_number_of_commands):
 
 
 def prompt_for_llm(prompt_for_llm):
-    """
-    Generates and displays the output from the language model based on the user's prompt.
-
-    Args:
-        prompt_for_llm (str): The prompt to send to the language model.
-    """
     prompt_for_llm += " give response in short form, if asked for commands then give commands and dont explain too much"
-
-    models_api_dict = load_models_api()
-    if models_api_dict["selected_model"] is None:
-        model_name = "gemini-1.5-flash"  # default
-    else:
-        model_name = models_api_dict["selected_model"]
-
-    response = generate_output(model_name, prompt_for_llm)
+    models_api_dict = manager.load()
+    model_name = models_api_dict["selected_model"] or "gemini-1.5-flash"
+    response = manager.generate_output(model_name, prompt_for_llm)
     prettify_llm_output(response)
 
 
@@ -95,12 +60,6 @@ def debug_last_command_line_prompt(prompt_by_user, all_input_flags):
 
 
 def handle_input_flags(all_input_flags):
-    """
-    Processes the input flags provided by the user and performs corresponding actions.
-
-    Args:
-        all_input_flags (list): A list of input flags provided by the user.
-    """
     if all_input_flags:
         if not all_input_flags[0] == "":
             print(
@@ -110,18 +69,18 @@ def handle_input_flags(all_input_flags):
         for flag in all_input_flags:
             flags_list = flag.split(" ")
             if flag.startswith("config"):
-                configure_model(flags_list[1], flags_list[2])
+                manager.configure_model(flags_list[1], flags_list[2])
                 print(
                     f"Configured model: {flags_list[1]} with API key: {flags_list[2]}"
                 )
             elif flag == "list":
                 print("Listing all models:")
-                ai_models.list_models()
+                manager.list_models()
             elif flag.startswith("remove"):
                 print("Removing model:", flags_list[1])
-                remove_model(flags_list[1])
+                manager.remove_model(flags_list[1])
             elif flag.startswith("select"):
-                ai_models.select_model(flags_list[1])
+                manager.select_model(flags_list[1])
             elif flag == "help":
                 print("Usage: python3 main.py <prompt>")
                 print("Example: python3 main.py 'How are you?'")
@@ -130,18 +89,6 @@ def handle_input_flags(all_input_flags):
 
 
 def handle_all_quries():
-    """
-    Handles all user queries from the command line prompt.
-
-    This function performs the following steps:
-    1. Retrieves the user command line prompt and input flags.
-    2. If a prompt is provided by the user, it processes the prompt for the LLM.
-    3. If no prompt is provided but the 'debug' flag is present, it triggers the debug function for the last command line prompt.
-    4. Handles any additional input flags provided by the user.
-
-    Returns:
-        None
-    """
     prompt_by_user, all_input_flags = user_command_line_prompt()
     if prompt_by_user:
         prompt_for_llm(prompt_by_user)
@@ -152,7 +99,7 @@ def handle_all_quries():
 
 def main():
     if len(sys.argv) > 1 and sys.argv[1] == "--setup":
-        create_json_file()
+        manager.create_default_file()
     else:
         handle_all_quries()
 

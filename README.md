@@ -18,11 +18,13 @@ To install [`Vertex-CLI`](https://github.com/prtm2110/vertex-cli) from TestPyPI,
 pip install -i https://test.pypi.org/simple/ Vertex-CLI
 ```
 
-After installation, initialize the CLI:
+After installation, initialize the CLI configuration file:
 
 ```bash
 tex-init
 ```
+
+This will create the `models_api.json` under `~/.config/ai_model_manager/` with default entries.
 
 ---
 
@@ -53,26 +55,53 @@ If you want to modify or contribute to Vertex CLI, install it in **editable mode
 
 ## Configuration
 
-You can configure the CLI to use a specific LLM model:
+You can configure the CLI to use a specific LLM model by adding or updating your API key:
 
 ```bash
-tex --config gemini-1.5-flash <model-api-key>
+tex config gemini-1.5-flash YOUR_MODEL_API_KEY
 ```
 
-Replace `gemini-1.5-flash` with your preferred model name and `<model-api-key>` with your API key.
+Replace `gemini-1.5-flash` with your preferred model name and `YOUR_MODEL_API_KEY` with your API key.
+
+To list all configured models:
+
+```bash
+tex list
+```
+
+To remove a model:
+
+```bash
+tex remove gemini-1.5-creative
+```
+
+To select a model as the default:
+
+```bash
+tex select gemini-1.5-flash
+```
 
 ---
 
 ## Usage
 
-Once installed, you can start using Vertex CLI by running:
+Once installed and configured, you can start chatting or debugging commands:
+
+### Chat with the LLM
+
+You can either use the `chat` subcommand or omit it entirely:
 
 ```bash
-tex "tell me about the solar system"
-```
-![alt text](docs/images/eg_matplotlib.gif)
+# Explicit subcommand
+tex chat "Tell me about the solar system"
 
-Replace `"tell me about solar system"` with any query you'd like.
+# Shortcut form (no subcommand)
+tex "Tell me about the solar system"
+```
+
+Replace the quoted string with any query you'd like.
+
+![alt text](docs/images/eg_matplotlib.gif)
 
 🔗 **Complete CLI Documentation:** [CLI Commands](https://prtm2110.github.io/Vertex-CLI/cli_tool_docs/)
 
@@ -80,28 +109,24 @@ Replace `"tell me about solar system"` with any query you'd like.
 
 ## Debugging Mode (Beta Feature)
 
-Debugging is currently in beta but can analyze recent commands to identify issues.
+Debugging is currently in beta but can analyze recent shell commands to identify issues.
 
-### Debug the Last Two Commands
+### Debug the Last 3 Commands (default)
 
 ```bash
-tex --debug
+tex debug
 ```
 
 ### Specify the Number of Commands to Debug
 
-To debug the last 5 commands:
-
 ```bash
-tex --debug --5
+tex debug -n 5
 ```
 
 ### Add a Custom Debugging Message
 
-Provide additional context while debugging:
-
 ```bash
-tex "I believe this can be solved by changing the environment variable" --debug
+tex debug -n 5 -p "Explain why \`git commit\` failed"
 ```
 
 ---
@@ -112,14 +137,17 @@ Contributions are welcome! Follow these steps to contribute:
 
 1. **Fork the repository**
 2. **Create a new branch**:
+
    ```bash
    git checkout -b feature/your-feature-name
    ```
 3. **Commit your changes**:
+
    ```bash
    git commit -m "Add your feature description"
    ```
 4. **Push your branch**:
+
    ```bash
    git push origin feature/your-feature-name
    ```

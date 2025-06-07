@@ -1,173 +1,174 @@
 import os
-import sys
 import json
+import sys
+import argparse
 from cli.ai_model_manager import AIModelManager
 from cli.prettify_llm_output import prettify_llm_output
 
-manager = AIModelManager()
-HISTORY_FILE = "chat_history.json"
+HISTORY_FILE = os.path.expanduser("~/.cache/cli_chat_history.json")
+DEFAULT_HISTORY_SIZE = 10
+DEFAULT_BASH_HISTORY_COUNT = 3
 
 
-def user_command_line_prompt():
-    """
-    Parses command-line arguments to separate the user's prompt and any additional flags.
+class ChatHistory:
+    def __init__(self, path: str, max_length: int = DEFAULT_HISTORY_SIZE):
+        self.path = path
+        self.max_length = max_length
+        self._ensure_file()
+        self._load()
 
-    Returns:
-        tuple: A tuple containing the user's prompt (str or None) and a list of input flags.
-    """
-    args = [x for x in sys.argv]
+    def _ensure_file(self):
+        parent = os.path.dirname(self.path)
+        os.makedirs(parent, exist_ok=True)
+        if not os.path.exists(self.path):
+            with open(self.path, "w") as f:
+                json.dump([], f)
 
-    if len(args) > 1 and not args[1].startswith("--"):
-        prompt_by_user = args[1]
-        entire_cmd_command = " ".join(args[2:])
-    else:
-        prompt_by_user = None
-        entire_cmd_command = " ".join(args[1:])
+    def _load(self):
+        try:
+            with open(self.path, "r") as f:
+                self.history = json.load(f)
+        except (json.JSONDecodeError, IOError):
+            self.history = []
 
-    all_input_flags = entire_cmd_command.split("--")
-    all_input_flags = [x.strip() for x in all_input_flags]
+    def append(self, role: str, content: str):
+        entry = {"role": role, "content": content}
+        self.history.append(entry)
+        self.history = self.history[-self.max_length :]
+        self._save()
 
-    return prompt_by_user, all_input_flags
+    def get_prompt(self) -> str:
+        return "".join(
+            f"{item['role'].capitalize()}: {item['content']}\n" for item in self.history
+        )
+
+    def _save(self):
+        with open(self.path, "w") as f:
+            json.dump(self.history, f, indent=2)
 
 
-def last_command_line_prompt(last_number_of_commands):
-    """
-    Retrieves the last N commands from the user's bash history.
-
-    Args:
-        last_number_of_commands (int): Number of recent commands to retrieve.
-
-    Returns:
-        str: The last N commands as a single string.
-    """
+def get_bash_history(count: int) -> str:
     history_file = os.path.expanduser("~/.bash_history")
-    with open(history_file, "r") as file:
-        history_lines = file.readlines()
-    last_commands = history_lines[-last_number_of_commands:]
-    return "".join(last_commands)
+    try:
+        with open(history_file, "r") as f:
+            lines = f.readlines()
+        return "".join(lines[-count:])
+    except IOError:
+        return ""
 
 
-def prompt_for_llm(prompt_for_llm, max_history=10):
-
-    def load_chat_history():
-        if os.path.exists(HISTORY_FILE):
-            with open(HISTORY_FILE, "r") as f:
-                try:
-                    return json.load(f)
-                except json.JSONDecodeError:
-                    return []
-        return []
-
-    def save_chat_history(history):
-        with open(HISTORY_FILE, "w") as f:
-            json.dump(history, f, indent=2)
-
-    # Load and update history
-    chat_history = load_chat_history()
-    styled_prompt = (
-        prompt_for_llm
-        + "System prompt: Give response in short and MD format, if asked for commands then give commands and don't explain too much"
+def generate_response(prompt: str, manager: AIModelManager, history: ChatHistory):
+    system_instruction = (
+        "System prompt: Give response in short and MD format, "
+        "if asked for commands then give commands and don't explain too much"
     )
-    chat_history.append({"role": "user", "content": styled_prompt})
-
-    # Flatten history to a single string for LLM
-    flat_prompt = ""
-    for message in chat_history[-max_history:]:
-        role = message["role"].capitalize()
-        flat_prompt += f"{role}: {message['content']}\n"
-
-    models_api_dict = manager.load()
-    model_name = models_api_dict.get("selected_model") or "gemini-1.5-flash"
-    response = manager.generate_output(model_name, flat_prompt)  # now a string
-
-    chat_history.append({"role": "assistant", "content": response})
-    save_chat_history(chat_history[-max_history:])
-
+    full_prompt = f"{prompt}\n{system_instruction}"
+    history.append("user", full_prompt)
+    flat_prompt = history.get_prompt()
+    models = manager.load()
+    selected = models.get("selected_model")
+    if not selected:
+        selected = "gemini-1.5-flash"
+    response = manager.generate_output(selected, flat_prompt)
+    history.append("assistant", response or "")
     prettify_llm_output(response)
 
 
-def debug_last_command_line_prompt(prompt_by_user, all_input_flags):
-    """
-    Analyzes and debugs the last few command-line commands using the LLM.
-
-    Args:
-        prompt_by_user (str or None): Optional user prompt to append.
-        all_input_flags (list): List of input flags provided in the CLI.
-    """
-    last_number_of_commands = (
-        int(all_input_flags[2]) if len(all_input_flags) == 3 else 3
-    )
-    if prompt_by_user:
-        prompt_by_vertex = (
-            last_command_line_prompt(last_number_of_commands)
-            + prompt_by_user
-            + " basically output what is wrong with the commands used and suggest right ones"
-        )
-    else:
-        prompt_by_vertex = (
-            last_command_line_prompt(last_number_of_commands)
-            + " output what is wrong with the commands used and suggest right ones, don’t explain about tex command"
-        )
-    print("Prompt by vertex:", prompt_by_vertex)
-    print()
-    prompt_for_llm(prompt_by_vertex)
-
-
-def handle_input_flags(all_input_flags):
-    """
-    Handles input flags such as configuring, removing, selecting, or listing models.
-
-    Args:
-        all_input_flags (list): List of input flags from the CLI.
-    """
-    if all_input_flags:
-        if not all_input_flags[0] == "":
-            print(
-                "Prompt should be quoted in double quotes, and the flags must be spaced out"
-            )
-
-        for flag in all_input_flags:
-            flags_list = flag.split(" ")
-            if flag.startswith("config"):
-                manager.configure_model(flags_list[1], flags_list[2])
-                print(
-                    f"Configured model: {flags_list[1]} with API key: {flags_list[2]}"
-                )
-            elif flag == "list":
-                print("Listing all models:")
-                manager.list_models()
-            elif flag.startswith("remove"):
-                print("Removing model:", flags_list[1])
-                manager.remove_model(flags_list[1])
-            elif flag.startswith("select"):
-                manager.select_model(flags_list[1])
-            elif flag == "help":
-                print("Usage: python3 main.py <prompt>")
-                print("Example: python3 main.py 'How are you?'")
-                print("Flags are: --config <model_name> <api_key>, remove <model_name>")
-                print()
-
-
-def handle_all_quries():
-    """
-    Main logic to handle prompt input, debugging, or flag-based commands from the CLI.
-    """
-    prompt_by_user, all_input_flags = user_command_line_prompt()
-    if prompt_by_user:
-        prompt_for_llm(prompt_by_user)
-    elif len(all_input_flags) > 1 and all_input_flags[1] == "debug":
-        debug_last_command_line_prompt(prompt_by_user, all_input_flags)
-    handle_input_flags(all_input_flags)
-
-
 def main():
-    """
-    Entry point for the CLI tool. Initializes config file or processes CLI inputs.
-    """
-    if len(sys.argv) > 1 and sys.argv[1] == "--setup":
+    raw = sys.argv[1:]
+    known_cmds = ["chat", "debug", "config", "list", "remove", "select"]
+
+    manager = AIModelManager()
+    history = ChatHistory(HISTORY_FILE)
+
+    # Setup shortcut
+    if raw and raw[0] == "--setup":
         manager.create_default_file()
+        print("Default configuration created.")
+        return
+
+    # Default chat if no subcommand
+    if raw and raw[0] not in known_cmds:
+        prompt_text = " ".join(raw)
+        generate_response(prompt_text, manager, history)
+        return
+
+    # Subcommand parsing
+    parser = argparse.ArgumentParser(
+        prog="tex", description="CLI for interacting with LLMs"
+    )
+    parser.add_argument("--setup", action="store_true", help="Create default config")
+    subparsers = parser.add_subparsers(dest="command")
+
+    # chat
+    chat_parser = subparsers.add_parser("chat", help="Send a prompt to the LLM")
+    chat_parser.add_argument("text", nargs="+", help="Prompt text")
+
+    # debug
+    debug_parser = subparsers.add_parser("debug", help="Debug recent bash commands")
+    debug_parser.add_argument(
+        "-n",
+        "--number",
+        type=int,
+        default=DEFAULT_BASH_HISTORY_COUNT,
+        help="Number of recent commands",
+    )
+    debug_parser.add_argument(
+        "-p", "--prompt", type=str, help="Additional explanation prompt"
+    )
+
+    # config
+    config_parser = subparsers.add_parser("config", help="Configure a model API key")
+    config_parser.add_argument("model", help="Model name")
+    config_parser.add_argument("key", help="API key")
+
+    # list
+    subparsers.add_parser("list", help="List configured models")
+
+    # remove
+    remove_parser = subparsers.add_parser("remove", help="Remove a configured model")
+    remove_parser.add_argument("model", help="Model name")
+
+    # select
+    select_parser = subparsers.add_parser("select", help="Select active model")
+    select_parser.add_argument("model", help="Model name")
+
+    args = parser.parse_args(raw)
+
+    if args.setup:
+        manager.create_default_file()
+        print("Default configuration created.")
+
+    elif args.command == "chat":
+        prompt_text = " ".join(args.text)
+        generate_response(prompt_text, manager, history)
+
+    elif args.command == "debug":
+        bash = get_bash_history(args.number)
+        dprompt = f"{bash}{args.prompt or ''} "
+        dprompt += (
+            "output what is wrong with the commands used and suggest correct ones"
+        )
+        generate_response(dprompt, manager, history)
+
+    elif args.command == "config":
+        manager.configure_model(args.model, args.key)
+
+    elif args.command == "list":
+        print("Configured models:")
+        manager.list_models()
+
+    elif args.command == "remove":
+        manager.remove_model(args.model)
+
+    elif args.command == "help":
+        parser.print_help()
+
+    elif args.command == "select":
+        manager.select_model(args.model)
+
     else:
-        handle_all_quries()
+        parser.print_help()
 
 
 if __name__ == "__main__":

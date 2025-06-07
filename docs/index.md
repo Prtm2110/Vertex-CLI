@@ -1,8 +1,9 @@
-# Homepage
+## Homepage
 
 ### Install Vertex-CLI from TestPyPI
 
-Vertex-CLI is a command-line tool that lets you use LLMs to answer queries and debug faster.
+**Vertex-CLI** is a command-line tool that lets you query Large Language Models (LLMs) and debug faster, straight from your terminal.
+
 For example, you can run:
 
 ```bash
@@ -11,37 +12,56 @@ tex "tell me about the solar system"
 
 ![Example usage](images/eg_matplotlib.gif)
 
-Replace `"tell me about the solar system"` with any query you like, and Vertex-CLI will generate an accurate response.
+Replace `"tell me about the solar system"` with any query you like Vertex-CLI will generate a response using your selected LLM model.
+
+---
 
 ### Installation
 
-To install [`Vertex-CLI`](https://github.com/prtm2110/vertex-cli) from TestPyPI, use:
+To install [`Vertex-CLI`](https://github.com/prtm2110/vertex-cli) from **TestPyPI**, run:
 
 ```bash
 pip install -i https://test.pypi.org/simple/ Vertex-CLI
-tex-init
 ```
-Or install Vertex-CLI in editable mode. See the [Contributors Guide](contributors_guide.md) for details.
 
-### Managing API Keys
+Then initialize the CLI with:
 
-- **Add a model and its API key:**
+```bash
+tex --setup
+```
+
+---
+
+###  Managing API Keys & Models
+
+* **Add a model and its API key:**
+
   ```bash
-  tex --config <model-name> <api-key>
+  tex config <model-name> <api-key>
   ```
-- **Remove a model:**
+
+* **Remove a model:**
+
   ```bash
-  tex --remove <model-name>
+  tex remove <model-name>
   ```
-- **Select a model:**
+
+* **List all configured models:**
+
   ```bash
-  tex --select
+  tex list
   ```
+
+* **Select a model to use by default:**
+
+  ```bash
+  tex select <model-name>
+  ```
+
+---
 
 ### Documentation
 
-- Full CLI tool docs: [CLI Tool Docs](cli_tool_docs.md)
-- Contribution guide: [Contributors Guide](contributors_guide.md)
-- API reference: [API Reference](references.md)
-
----
+* Full CLI tool docs: [CLI Tool Docs](cli_tool_docs.md)
+* Contributor guide: [Contributors Guide](contributors_guide.md)
+* API reference: [API Reference](references.md)

@@ -1,30 +1,12 @@
 import os
-import json
 import sys
 import argparse
 from cli.ai_model_manager import AIModelManager
-from cli.prettify_llm_output import prettify_llm_output
 from cli.chat_history import ChatHistory, get_bash_history
+from cli.llm import generate_response
 
 HISTORY_FILE = os.path.expanduser("~/.cache/cli_chat_history.json")
 DEFAULT_BASH_HISTORY_COUNT = 3
-
-
-def generate_response(prompt: str, manager: AIModelManager, history: ChatHistory):
-    system_instruction = (
-        "System prompt: Give response in short and MD format, "
-        "if asked for commands then give commands and don't explain too much"
-    )
-    full_prompt = f"{prompt}\n{system_instruction}"
-    history.append("user", full_prompt)
-    flat_prompt = history.get_prompt()
-    models = manager.load()
-    selected = models.get("selected_model")
-    if not selected:
-        selected = "gemini-1.5-flash"
-    response = manager.generate_output(selected, flat_prompt)
-    history.append("assistant", response or "")
-    prettify_llm_output(response)
 
 
 def main():

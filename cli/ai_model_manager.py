@@ -2,7 +2,6 @@ import json
 import os
 import threading
 from cli.utils import spin_loader
-from cli.llm import gemini_api_output
 
 
 class AIModelManager:
@@ -171,6 +170,8 @@ class AIModelManager:
         stop_spinner = threading.Event()
         spinner_thread = threading.Thread(target=spin_loader, args=(stop_spinner,))
         spinner_thread.start()
+
+        from cli.llm import gemini_api_output
 
         output = gemini_api_output(model_name, prompt_by_user)
 

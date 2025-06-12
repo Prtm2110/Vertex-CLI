@@ -57,13 +57,13 @@ class AIModelManager:
     def create_default_file(self):
         """
         Creates a configuration file with default model entries.
-        Includes a pre-set API key for `gemini-1.5-flash`.
+        Includes a pre-set API key for `gemini-2.5-flash`.
         """
         default_config = {
             "selected_model": None,
-            "gemini-1.5-flash": "AIzaSyCSXtRAITXfGuarMHI1j-0QyKkoT9mUfz8",
-            "gemini-1.5-interactive": None,
-            "gemini-1.5-creative": None,
+            "gemini-2.5-flash": "AIzaSyCRVaCSsM8B4_C10aCRBpKB_ODncP64Pmk",
+            "gemini-2.0-flash": None,
+            "gemini-flash-latest": None,
         }
         self._write_json(default_config)
         print(f"Config file created at: {self.file_path}")

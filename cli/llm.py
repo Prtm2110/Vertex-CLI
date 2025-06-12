@@ -39,7 +39,7 @@ def generate_response(prompt: str, manager: AIModelManager, history: ChatHistory
     models = manager.load()
     selected = models.get("selected_model")
     if not selected:
-        selected = "gemini-1.5-flash"
+        selected = "gemini-2.5-flash"
     response = manager.generate_output(selected, flat_prompt)
     history.append("assistant", response or "")
     prettify_llm_output(response)

@@ -9,62 +9,84 @@ HISTORY_FILE = os.path.expanduser("~/.cache/cli_chat_history.json")
 DEFAULT_BASH_HISTORY_COUNT = 3
 
 
+def handle_command(args, manager, history):
+    """Handle different CLI commands."""
+    if args.command == "chat":
+        prompt_text = " ".join(args.text)
+        generate_response(prompt_text, manager, history)
+        
+    elif args.command == "debug":
+        bash = get_bash_history(args.number)
+        dprompt = f"{bash}{args.prompt or ''} output what is wrong with the commands used and suggest correct ones"
+        generate_response(dprompt, manager, history)
+        
+    elif args.command == "config":
+        if not manager.validate_model(args.model):
+            print(f"❌ '{args.model}' is not supported. Use 'tex models' to see all models.")
+            return
+        manager.configure_model(args.model, args.key)
+        
+    elif args.command == "list":
+        manager.list_models()
+        
+    elif args.command == "models":
+        print("🚀 All supported models:")
+        manager.print_supported_models()
+        
+    elif args.command == "remove":
+        manager.remove_model(args.model)
+        
+    elif args.command == "select":
+        if not manager.validate_model(args.model):
+            print(f"❌ '{args.model}' is not supported. Use 'tex models' to see all models.")
+            return
+        manager.select_model(args.model)
+        
+    else:
+        print("❌ Unknown command. Use 'tex --help' for available commands.")
+
+
 def main():
     raw = sys.argv[1:]
-    known_cmds = ["chat", "debug", "config", "list", "remove", "select"]
+    known_cmds = ["chat", "debug", "config", "list", "remove", "select", "models"]
 
     manager = AIModelManager()
     history = ChatHistory(HISTORY_FILE)
 
-    # Setup shortcut
+    # Handle setup shortcut
     if raw and raw[0] == "--setup":
         manager.create_default_file()
-        print("Default configuration created.")
         return
 
-    # Default chat if no subcommand
-    if raw and raw[0] not in known_cmds:
+    # Handle direct chat (no subcommand)
+    if raw and raw[0] not in known_cmds and not raw[0].startswith("-"):
         prompt_text = " ".join(raw)
         generate_response(prompt_text, manager, history)
         return
 
-    # Subcommand parsing
-    parser = argparse.ArgumentParser(
-        prog="tex", description="CLI for interacting with LLMs"
-    )
+    # Parse commands
+    parser = argparse.ArgumentParser(prog="tex", description="🤖 Multi-model CLI for AI chat")
     parser.add_argument("--setup", action="store_true", help="Create default config")
     subparsers = parser.add_subparsers(dest="command")
 
-    # chat
-    chat_parser = subparsers.add_parser("chat", help="Send a prompt to the LLM")
-    chat_parser.add_argument("text", nargs="+", help="Prompt text")
+    # Define subcommands
+    chat_parser = subparsers.add_parser("chat", help="Chat with AI")
+    chat_parser.add_argument("text", nargs="+", help="Your message")
 
-    # debug
-    debug_parser = subparsers.add_parser("debug", help="Debug recent bash commands")
-    debug_parser.add_argument(
-        "-n",
-        "--number",
-        type=int,
-        default=DEFAULT_BASH_HISTORY_COUNT,
-        help="Number of recent commands",
-    )
-    debug_parser.add_argument(
-        "-p", "--prompt", type=str, help="Additional explanation prompt"
-    )
+    debug_parser = subparsers.add_parser("debug", help="Debug bash commands") 
+    debug_parser.add_argument("-n", "--number", type=int, default=DEFAULT_BASH_HISTORY_COUNT, help="Number of commands")
+    debug_parser.add_argument("-p", "--prompt", type=str, help="Additional context")
 
-    # config
-    config_parser = subparsers.add_parser("config", help="Configure a model API key")
+    config_parser = subparsers.add_parser("config", help="Configure model API key")
     config_parser.add_argument("model", help="Model name")
     config_parser.add_argument("key", help="API key")
 
-    # list
     subparsers.add_parser("list", help="List configured models")
+    subparsers.add_parser("models", help="Show all supported models")
 
-    # remove
-    remove_parser = subparsers.add_parser("remove", help="Remove a configured model")
+    remove_parser = subparsers.add_parser("remove", help="Remove model")
     remove_parser.add_argument("model", help="Model name")
 
-    # select
     select_parser = subparsers.add_parser("select", help="Select active model")
     select_parser.add_argument("model", help="Model name")
 
@@ -72,36 +94,8 @@ def main():
 
     if args.setup:
         manager.create_default_file()
-        print("Default configuration created.")
-
-    elif args.command == "chat":
-        prompt_text = " ".join(args.text)
-        generate_response(prompt_text, manager, history)
-
-    elif args.command == "debug":
-        bash = get_bash_history(args.number)
-        dprompt = f"{bash}{args.prompt or ''} "
-        dprompt += (
-            "output what is wrong with the commands used and suggest correct ones"
-        )
-        generate_response(dprompt, manager, history)
-
-    elif args.command == "config":
-        manager.configure_model(args.model, args.key)
-
-    elif args.command == "list":
-        print("Configured models:")
-        manager.list_models()
-
-    elif args.command == "remove":
-        manager.remove_model(args.model)
-
-    elif args.command == "help":
-        parser.print_help()
-
-    elif args.command == "select":
-        manager.select_model(args.model)
-
+    elif args.command:
+        handle_command(args, manager, history)
     else:
         parser.print_help()
 

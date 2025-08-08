@@ -1,2 +1,5 @@
 rich==14.0.0
-google-genai
+# Core dependencies - others installed automatically when needed
+openai>=1.0.0
+anthropic>=0.30.0
+google-generativeai>=0.8.0

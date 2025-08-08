@@ -52,10 +52,20 @@ class AIModelManager:
         if not self.validate_model(model_name):
             raise ValueError(f"Unsupported model: {model_name}")
         
+        # Warn about test keys
+        if self._is_test_key(api_key):
+            print(f"⚠️  Warning: '{api_key}' looks like a test key. Please use your actual API key.")
+            print(f"   Get your real API key from the provider's website.")
+        
         data = self._read_json()
         data[model_name] = api_key
         self._write_json(data)
         print(f"✅ {model_name} configured successfully.")
+
+    def _is_test_key(self, api_key):
+        """Check if the API key looks like a test key."""
+        test_patterns = ["test", "fake", "dummy", "example", "demo", "placeholder", "your_api_key"]
+        return any(pattern in api_key.lower() for pattern in test_patterns)
 
     def remove_model(self, model_name):
         data = self._read_json()
@@ -136,3 +146,37 @@ class AIModelManager:
             print(f"\n🔹 {provider.upper()}:")
             for model in models:
                 print(f"  • {model}")
+
+    def validate_all_models(self):
+        """Test all configured models with a simple prompt."""
+        print("🧪 Testing all configured models...")
+        data = self._read_json()
+        configured_models = [(model, key) for model, key in data.items() 
+                           if model != "selected_model" and key]
+        
+        if not configured_models:
+            print("❌ No models configured. Use 'tex config MODEL_NAME API_KEY' to add models.")
+            return
+        
+        test_prompt = "Hello! Please respond with 'OK' to confirm you're working."
+        
+        for model_name, api_key in configured_models:
+            print(f"\n🔍 Testing {model_name}...")
+            
+            if self._is_test_key(api_key):
+                print(f"  ⚠️  Skipped - test key detected: {api_key[:10]}...")
+                continue
+                
+            try:
+                response = self.generate_output(model_name, test_prompt)
+                if response.startswith("❌"):
+                    print(f"  ❌ Failed: {response}")
+                else:
+                    print(f"  ✅ Working: {response.strip()[:50]}...")
+            except Exception as e:
+                print(f"  ❌ Error: {str(e)[:100]}...")
+        
+        print("\n💡 To fix issues:")
+        print("   • Get real API keys from provider websites")
+        print("   • Run: tex config MODEL_NAME YOUR_REAL_API_KEY")
+        print("   • Check quota/billing on provider dashboards")

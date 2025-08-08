@@ -77,7 +77,13 @@ class OpenAIProvider(LLMProvider):
             )
             return response.choices[0].message.content
         except Exception as e:
-            raise Exception(f"OpenAI API error: {str(e)}")
+            error_msg = str(e)
+            if "401" in error_msg or "invalid_api_key" in error_msg:
+                raise Exception(f"❌ Invalid OpenAI API key. Get your key at: https://platform.openai.com/api-keys\n   Run: tex config {self.model_name} YOUR_ACTUAL_API_KEY")
+            elif "quota" in error_msg.lower() or "billing" in error_msg.lower():
+                raise Exception(f"❌ OpenAI quota exceeded or billing issue. Check your account at: https://platform.openai.com/account/billing")
+            else:
+                raise Exception(f"OpenAI API error: {str(e)}")
 
 
 class AnthropicProvider(LLMProvider):
@@ -105,7 +111,13 @@ class AnthropicProvider(LLMProvider):
             response = client.messages.create(**kwargs)
             return response.content[0].text
         except Exception as e:
-            raise Exception(f"Anthropic API error: {str(e)}")
+            error_msg = str(e)
+            if "401" in error_msg or "invalid" in error_msg.lower():
+                raise Exception(f"❌ Invalid Anthropic API key. Get your key at: https://console.anthropic.com/\n   Run: tex config {self.model_name} YOUR_ACTUAL_API_KEY")
+            elif "quota" in error_msg.lower() or "billing" in error_msg.lower():
+                raise Exception(f"❌ Anthropic quota exceeded or billing issue. Check your account at: https://console.anthropic.com/settings/billing")
+            else:
+                raise Exception(f"Anthropic API error: {str(e)}")
 
 
 class GoogleProvider(LLMProvider):
@@ -127,7 +139,13 @@ class GoogleProvider(LLMProvider):
             response = model.generate_content(full_prompt)
             return response.text
         except Exception as e:
-            raise Exception(f"Google API error: {str(e)}")
+            error_msg = str(e)
+            if "401" in error_msg or "invalid" in error_msg.lower() or "API_KEY_INVALID" in error_msg:
+                raise Exception(f"❌ Invalid Google API key. Get your key at: https://makersuite.google.com/app/apikey\n   Run: tex config {self.model_name} YOUR_ACTUAL_API_KEY")
+            elif "quota" in error_msg.lower() or "billing" in error_msg.lower():
+                raise Exception(f"❌ Google API quota exceeded. Check your quota at: https://console.cloud.google.com/apis/api/generativelanguage.googleapis.com/quotas")
+            else:
+                raise Exception(f"Google API error: {str(e)}")
 
 
 class LLMProviderFactory:

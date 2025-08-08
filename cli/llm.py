@@ -1,45 +1,40 @@
 import os
-
-from google import genai
 from cli.ai_model_manager import AIModelManager
 from cli.prettify_llm_output import prettify_llm_output
 from cli.chat_history import ChatHistory
 
 
-def gemini_api_output(model_name, prompt_by_user):
-    """
-    Generate AI response using specified model.
-
-    Args:
-        model_name (str): Name of the AI model to use.
-        prompt_by_user (str): User's input prompt.
-
-    Returns:
-        str: Generated response text.
-    """
-    from cli.ai_model_manager import AIModelManager
-
-    manager = AIModelManager()
-    api_key = manager.get_api_key(model_name)
-
-    client = genai.Client(api_key=api_key)
-    response = client.models.generate_content(model=model_name, contents=prompt_by_user)
-
-    return response.text
-
-
 def generate_response(prompt: str, manager: AIModelManager, history: ChatHistory):
+    """Generate AI response using the selected model."""
     system_instruction = (
-        "System prompt: Give response in short and MD format, "
-        "if asked for commands then give commands and don't explain too much"
+        "Give response in short and markdown format. "
+        "If asked for commands, give commands without too much explanation."
     )
-    full_prompt = f"{prompt}\n{system_instruction}"
-    history.append("user", full_prompt)
-    flat_prompt = history.get_prompt()
+    
+    # Add to history
+    history.append("user", prompt)
+    full_prompt = history.get_prompt()
+    
+    # Get selected model or use available one
     models = manager.load()
     selected = models.get("selected_model")
+    
     if not selected:
-        selected = "gemini-1.5-flash"
-    response = manager.generate_output(selected, flat_prompt)
-    history.append("assistant", response or "")
-    prettify_llm_output(response)
+        available = manager.get_available_models()
+        if available:
+            selected = available[0]
+            print(f"ℹ️  Using {selected} (no model selected)")
+        else:
+            print("❌ No models configured! Configure one with:")
+            print("   tex config MODEL_NAME YOUR_API_KEY")
+            print("   tex models  # to see available models")
+            return
+    
+    try:
+        response = manager.generate_output(selected, full_prompt, system_instruction)
+        history.append("assistant", response or "")
+        prettify_llm_output(response)
+    except Exception as e:
+        print(f"❌ Error: {str(e)}")
+        if "not configured" in str(e).lower():
+            print(f"💡 Configure {selected} with: tex config {selected} YOUR_API_KEY")

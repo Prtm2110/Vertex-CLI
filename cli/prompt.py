@@ -42,13 +42,16 @@ def handle_command(args, manager, history):
             return
         manager.select_model(args.model)
         
+    elif args.command == "validate":
+        manager.validate_all_models()
+        
     else:
         print("❌ Unknown command. Use 'tex --help' for available commands.")
 
 
 def main():
     raw = sys.argv[1:]
-    known_cmds = ["chat", "debug", "config", "list", "remove", "select", "models"]
+    known_cmds = ["chat", "debug", "config", "list", "remove", "select", "models", "validate"]
 
     manager = AIModelManager()
     history = ChatHistory(HISTORY_FILE)
@@ -89,6 +92,8 @@ def main():
 
     select_parser = subparsers.add_parser("select", help="Select active model")
     select_parser.add_argument("model", help="Model name")
+
+    subparsers.add_parser("validate", help="Test all configured models")
 
     args = parser.parse_args(raw)
 

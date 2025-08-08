@@ -1,8 +1,9 @@
 # Vertex CLI
 
-Vertex CLI is a powerful command-line tool that leverages Large Language Models (LLMs) to answer queries and debug faster. With just a few commands, you can set up and start using advanced features like querying LLMs and generating insights.
+Vertex CLI is a powerful command-line tool that leverages multiple Large Language Models (LLMs) to answer queries and debug faster. With support for OpenAI GPT models, Anthropic Claude, and Google Gemini, you can choose the best model for your needs.
 
 **Complete Documentation:** [Vertex CLI Docs](https://prtm2110.github.io/Vertex-CLI/)
+
 
 ---
 
@@ -53,32 +54,68 @@ If you want to modify or contribute to Vertex CLI, install it in **editable mode
 
 ---
 
-## Configuration
+## 🚀 Supported Models
 
-You can configure the CLI to use a specific LLM model by adding or updating your API key:
+Vertex CLI supports models from multiple providers:
 
+### 🤖 OpenAI Models
+- `gpt-4o` - Latest GPT-4 Omni model  
+- `gpt-4o-mini` - Faster, cost-effective GPT-4 Omni
+- `gpt-4-turbo` - GPT-4 Turbo with improved performance
+- `gpt-4` - Original GPT-4 model
+- `gpt-3.5-turbo` - Fast and efficient model
+- `chatgpt` - Alias for gpt-3.5-turbo
+
+### 🧠 Anthropic Claude Models  
+- `claude-3-5-sonnet` - Latest Claude 3.5 Sonnet
+- `claude-3-5-haiku` - Fast Claude 3.5 Haiku
+- `claude-3-opus` - Most capable Claude 3 model
+- `claude-3-sonnet` - Balanced Claude 3 model
+- `claude-3-haiku` - Fast Claude 3 model
+
+### 🔮 Google Gemini Models
+- `gemini-1.5-pro` - Advanced Gemini model
+- `gemini-1.5-flash` - Fast Gemini model  
+- `gemini-1.5-flash-8b` - Efficient 8B parameter model
+- `gemini-pro` - Standard Gemini model
+
+---
+
+## ⚙️ Configuration
+
+### View All Supported Models
 ```bash
-tex config gemini-1.5-flash YOUR_MODEL_API_KEY
+tex models
 ```
 
-Replace `gemini-1.5-flash` with your preferred model name and `YOUR_MODEL_API_KEY` with your API key.
+### Configure API Keys
 
-To list all configured models:
+Configure your API keys for different providers:
 
+```bash
+# OpenAI
+tex config gpt-4o YOUR_OPENAI_API_KEY
+tex config gpt-3.5-turbo YOUR_OPENAI_API_KEY
+
+### Model Management
+
+List configured models and their status:
 ```bash
 tex list
 ```
 
-To remove a model:
-
+Select a default model:
 ```bash
-tex remove gemini-1.5-creative
+tex select gpt-4o
+# or
+tex select claude-3-5-sonnet  
+# or
+tex select gemini-1.5-pro
 ```
 
-To select a model as the default:
-
+Remove a model configuration:
 ```bash
-tex select gemini-1.5-flash
+tex remove model-name
 ```
 
 ---

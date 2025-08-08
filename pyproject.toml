@@ -1,13 +1,16 @@
 [project]
 name = "Vertex-CLI"
-version = "0.1.41"
-description = "A CLI tool for debugging and generating AI outputs based on prompts"
+version = "0.2.0"
+description = "A CLI tool with multi-model AI support (OpenAI, Anthropic, Google) for debugging and generating AI outputs"
 readme = "README.md"
 authors = [
     { name = "Pratham Hole", email = "prathamhole@gmail.com" }
 ]
 dependencies = [
     "rich==14.0.0",
+    "openai>=1.0.0",
+    "anthropic>=0.30.0", 
+    "google-generativeai>=0.8.0",
 ]
 license = { text = "BSD License" }
 keywords = ["CLI", "AI", "debugging", "prompt"]
@@ -21,12 +24,28 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12"
 ]
+
 [project.urls]
 Homepage = "https://github.com/Prtm2110/Vertex-CLI"
 Repository = "https://github.com/Prtm2110/Vertex-CLI"
 
 [project.optional-dependencies]
-dev = ["twine", "build", "mkdocs-material", "mkdocs-material[imaging]", "mkdocstrings", "mkdocstrings-python"]
+dev = [
+    "twine", 
+    "build", 
+    "mkdocs-material", 
+    "mkdocs-material[imaging]", 
+    "mkdocstrings", 
+    "mkdocstrings-python",
+    "pytest>=7.0.0",
+    "pytest-mock>=3.10.0",
+    "pytest-asyncio>=0.21.0",
+    "pytest-cov>=4.0.0",
+    "flake8>=6.0.0",
+    "black>=22.0.0",
+    "safety>=2.0.0",
+    "bandit>=1.7.0"
+]
 
 [project.scripts]
 tex = "cli.prompt:main"
@@ -35,3 +54,89 @@ tex-init = "cli.utils:install_requirements"
 [build-system]
 requires = ["setuptools>=42", "wheel"]
 build-backend = "setuptools.build_meta"
+
+[tool.pytest.ini_options]
+minversion = "7.0"
+addopts = "-ra -q --strict-markers --strict-config"
+testpaths = [
+    "tests",
+]
+python_files = [
+    "test_*.py",
+    "*_test.py",
+]
+python_classes = [
+    "Test*",
+]
+python_functions = [
+    "test_*",
+]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "integration: marks tests as integration tests",
+    "unit: marks tests as unit tests",
+]
+filterwarnings = [
+    "error",
+    "ignore::UserWarning",
+    "ignore::DeprecationWarning",
+]
+
+[tool.coverage.run]
+source = ["cli"]
+omit = [
+    "*/tests/*",
+    "*/test_*",
+    "*/__pycache__/*",
+    "*/venv/*",
+    "*/env/*",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if self.debug:",
+    "if settings.DEBUG",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if 0:",
+    "if __name__ == .__main__.:",
+    "class .*\\bProtocol\\):",
+    "@(abc\\.)?abstractmethod",
+]
+
+[tool.flake8]
+max-line-length = 127
+extend-ignore = [
+    "E203",  # whitespace before ':'
+    "E501",  # line too long (handled by black)
+    "W503",  # line break before binary operator
+]
+exclude = [
+    ".git",
+    "__pycache__",
+    "build",
+    "dist",
+    ".venv",
+    "venv",
+    ".env",
+]
+
+[tool.black]
+line-length = 127
+target-version = ['py38']
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  # directories
+  \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | build
+  | dist
+)/
+'''

@@ -59,14 +59,14 @@ If you want to modify or contribute to Vertex CLI, install it in **editable mode
 Vertex CLI supports models from multiple providers:
 
 ### 🤖 OpenAI Models
-- `gpt-4o` - Latest GPT-4 Omni model  
+- `gpt-4o` - Latest GPT-4 Omni model
 - `gpt-4o-mini` - Faster, cost-effective GPT-4 Omni
 - `gpt-4-turbo` - GPT-4 Turbo with improved performance
 - `gpt-4` - Original GPT-4 model
 - `gpt-3.5-turbo` - Fast and efficient model
 - `chatgpt` - Alias for gpt-3.5-turbo
 
-### 🧠 Anthropic Claude Models  
+### 🧠 Anthropic Claude Models
 - `claude-3-5-sonnet` - Latest Claude 3.5 Sonnet
 - `claude-3-5-haiku` - Fast Claude 3.5 Haiku
 - `claude-3-opus` - Most capable Claude 3 model
@@ -75,7 +75,7 @@ Vertex CLI supports models from multiple providers:
 
 ### 🔮 Google Gemini Models
 - `gemini-1.5-pro` - Advanced Gemini model
-- `gemini-1.5-flash` - Fast Gemini model  
+- `gemini-1.5-flash` - Fast Gemini model
 - `gemini-1.5-flash-8b` - Efficient 8B parameter model
 - `gemini-pro` - Standard Gemini model
 
@@ -108,7 +108,7 @@ Select a default model:
 ```bash
 tex select gpt-4o
 # or
-tex select claude-3-5-sonnet  
+tex select claude-3-5-sonnet
 # or
 tex select gemini-1.5-pro
 ```

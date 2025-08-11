@@ -51,12 +51,12 @@ class AIModelManager:
     def configure_model(self, model_name, api_key):
         if not self.validate_model(model_name):
             raise ValueError(f"Unsupported model: {model_name}")
-        
+
         # Warn about test keys
         if self._is_test_key(api_key):
             print(f"⚠️  Warning: '{api_key}' looks like a test key. Please use your actual API key.")
             print(f"   Get your real API key from the provider's website.")
-        
+
         data = self._read_json()
         data[model_name] = api_key
         self._write_json(data)
@@ -100,13 +100,13 @@ class AIModelManager:
         if not self.validate_model(model_name):
             print(f"❌ '{model_name}' is not a supported model.")
             return False
-            
+
         data = self._read_json()
         if model_name not in data or not data[model_name]:
             print(f"❌ '{model_name}' is not configured. Configure it first with:")
             print(f"    tex config {model_name} YOUR_API_KEY")
             return False
-            
+
         data["selected_model"] = model_name
         self._write_json(data)
         print(f"✅ Selected model: {model_name}")
@@ -134,8 +134,7 @@ class AIModelManager:
 
     def get_available_models(self):
         data = self._read_json()
-        return [model for model, key in data.items() 
-                if model != "selected_model" and key]
+        return [model for model, key in data.items() if model != "selected_model" and key]
 
     def get_supported_models(self):
         return LLMProviderFactory.get_supported_models()
@@ -151,22 +150,21 @@ class AIModelManager:
         """Test all configured models with a simple prompt."""
         print("🧪 Testing all configured models...")
         data = self._read_json()
-        configured_models = [(model, key) for model, key in data.items() 
-                           if model != "selected_model" and key]
-        
+        configured_models = [(model, key) for model, key in data.items() if model != "selected_model" and key]
+
         if not configured_models:
             print("❌ No models configured. Use 'tex config MODEL_NAME API_KEY' to add models.")
             return
-        
+
         test_prompt = "Hello! Please respond with 'OK' to confirm you're working."
-        
+
         for model_name, api_key in configured_models:
             print(f"\n🔍 Testing {model_name}...")
-            
+
             if self._is_test_key(api_key):
                 print(f"  ⚠️  Skipped - test key detected: {api_key[:10]}...")
                 continue
-                
+
             try:
                 response = self.generate_output(model_name, test_prompt)
                 if response.startswith("❌"):
@@ -175,7 +173,7 @@ class AIModelManager:
                     print(f"  ✅ Working: {response.strip()[:50]}...")
             except Exception as e:
                 print(f"  ❌ Error: {str(e)[:100]}...")
-        
+
         print("\n💡 To fix issues:")
         print("   • Get real API keys from provider websites")
         print("   • Run: tex config MODEL_NAME YOUR_REAL_API_KEY")

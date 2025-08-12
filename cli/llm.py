@@ -7,18 +7,17 @@ from cli.chat_history import ChatHistory
 def generate_response(prompt: str, manager: AIModelManager, history: ChatHistory):
     """Generate AI response using the selected model."""
     system_instruction = (
-        "Give response in short and markdown format. "
-        "If asked for commands, give commands without too much explanation."
+        "Give response in short and markdown format. " "If asked for commands, give commands without too much explanation."
     )
-    
+
     # Add to history
     history.append("user", prompt)
     full_prompt = history.get_prompt()
-    
+
     # Get selected model or use available one
     models = manager.load()
     selected = models.get("selected_model")
-    
+
     if not selected:
         available = manager.get_available_models()
         if available:
@@ -29,7 +28,7 @@ def generate_response(prompt: str, manager: AIModelManager, history: ChatHistory
             print("   tex config MODEL_NAME YOUR_API_KEY")
             print("   tex models  # to see available models")
             return
-    
+
     try:
         response = manager.generate_output(selected, full_prompt, system_instruction)
         history.append("assistant", response or "")

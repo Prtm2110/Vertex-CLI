@@ -9,7 +9,7 @@ authors = [
 dependencies = [
     "rich==14.0.0",
     "openai>=1.0.0",
-    "anthropic>=0.30.0", 
+    "anthropic>=0.30.0",
     "google-generativeai>=0.8.0",
 ]
 license = { text = "BSD License" }
@@ -31,11 +31,11 @@ Repository = "https://github.com/Prtm2110/Vertex-CLI"
 
 [project.optional-dependencies]
 dev = [
-    "twine", 
-    "build", 
-    "mkdocs-material", 
-    "mkdocs-material[imaging]", 
-    "mkdocstrings", 
+    "twine",
+    "build",
+    "mkdocs-material",
+    "mkdocs-material[imaging]",
+    "mkdocstrings",
     "mkdocstrings-python",
     "pytest>=7.0.0",
     "pytest-mock>=3.10.0",

@@ -57,12 +57,12 @@ python -m cli.prompt remove model-name
 
 ## Features
 
-✅ **Multi-Model Support**: OpenAI GPT, Anthropic Claude, Google Gemini  
-✅ **Automatic Dependencies**: Installs packages only when needed  
-✅ **Simple Configuration**: Easy API key management  
-✅ **Smart Defaults**: Uses available models intelligently  
-✅ **Rich Output**: Beautiful formatted responses  
-✅ **Chat History**: Maintains conversation context  
+✅ **Multi-Model Support**: OpenAI GPT, Anthropic Claude, Google Gemini
+✅ **Automatic Dependencies**: Installs packages only when needed
+✅ **Simple Configuration**: Easy API key management
+✅ **Smart Defaults**: Uses available models intelligently
+✅ **Rich Output**: Beautiful formatted responses
+✅ **Chat History**: Maintains conversation context
 
 ## API Keys
 

@@ -14,37 +14,37 @@ def handle_command(args, manager, history):
     if args.command == "chat":
         prompt_text = " ".join(args.text)
         generate_response(prompt_text, manager, history)
-        
+
     elif args.command == "debug":
         bash = get_bash_history(args.number)
         dprompt = f"{bash}{args.prompt or ''} output what is wrong with the commands used and suggest correct ones"
         generate_response(dprompt, manager, history)
-        
+
     elif args.command == "config":
         if not manager.validate_model(args.model):
             print(f"❌ '{args.model}' is not supported. Use 'tex models' to see all models.")
             return
         manager.configure_model(args.model, args.key)
-        
+
     elif args.command == "list":
         manager.list_models()
-        
+
     elif args.command == "models":
         print("🚀 All supported models:")
         manager.print_supported_models()
-        
+
     elif args.command == "remove":
         manager.remove_model(args.model)
-        
+
     elif args.command == "select":
         if not manager.validate_model(args.model):
             print(f"❌ '{args.model}' is not supported. Use 'tex models' to see all models.")
             return
         manager.select_model(args.model)
-        
+
     elif args.command == "validate":
         manager.validate_all_models()
-        
+
     else:
         print("❌ Unknown command. Use 'tex --help' for available commands.")
 
@@ -76,7 +76,7 @@ def main():
     chat_parser = subparsers.add_parser("chat", help="Chat with AI")
     chat_parser.add_argument("text", nargs="+", help="Your message")
 
-    debug_parser = subparsers.add_parser("debug", help="Debug bash commands") 
+    debug_parser = subparsers.add_parser("debug", help="Debug bash commands")
     debug_parser.add_argument("-n", "--number", type=int, default=DEFAULT_BASH_HISTORY_COUNT, help="Number of commands")
     debug_parser.add_argument("-p", "--prompt", type=str, help="Additional context")
 

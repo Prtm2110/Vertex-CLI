@@ -1,25 +1,40 @@
-name: ci
+name: Documentation
+
 on:
   push:
     branches:
       - master
       - main
+
 permissions:
   contents: write
+
 jobs:
-  deploy:
+  deploy-docs:
+    name: Deploy Documentation
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
           python-version: 3.x
-      - uses: actions/cache@v4  # Updated from v2 to v4
+
+      - name: Cache pip dependencies
+        uses: actions/cache@v4
         with:
           key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
           path: ~/.cache/pip
           restore-keys: |
             ${{ runner.os }}-pip-
-      - run: pip install mkdocs-material mkdocstrings mkdocstrings-python
-      - run: pip install pillow cairosvg
-      - run: mkdocs gh-deploy --force
+
+      - name: Install dependencies
+        run: |
+          pip install mkdocs-material mkdocstrings mkdocstrings-python
+          pip install pillow cairosvg
+
+      - name: Deploy documentation
+        run: mkdocs gh-deploy --force

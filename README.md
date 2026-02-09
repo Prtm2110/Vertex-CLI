@@ -1,53 +1,93 @@
 # Vertex CLI
 
-Vertex CLI is a powerful command-line tool that leverages Large Language Models (LLMs) to answer queries and debug faster. With just a few commands, you can set up and start using advanced features like querying LLMs and generating insights.
+A modern CLI tool for interacting with multiple LLMs using LangChain.
 
-**Complete Documentation:** [Vertex CLI Docs](https://prtm2110.github.io/Vertex-CLI/)
+## Features
 
----
+- Unified interface for multiple LLM providers (Google Gemini, OpenAI, Anthropic Claude)
+- Clean architecture following SOLID principles
+- Conversation history management
+- Bash command debugging
+- Easy model switching
 
-## Installation and Setup
-
-Follow these steps to get started:
-
-### Install Vertex-CLI from TestPyPI
-
-To install [`Vertex-CLI`](https://github.com/prtm2110/vertex-cli) from TestPyPI, run:
+## Installation
 
 ```bash
-pip install -i https://test.pypi.org/simple/ Vertex-CLI
+git clone https://github.com/Prtm2110/Vertex-CLI.git
+cd Vertex-CLI
+pip install -e .
 ```
 
-After installation, initialize the CLI configuration file:
+## Quick Start
 
 ```bash
-tex-init
+# Initialize configuration
+tex --setup
+
+# Configure a model (provider auto-detected from model name)
+tex config gemini-2.5-flash YOUR_API_KEY
+tex config gpt-4 YOUR_OPENAI_KEY
+tex config claude-3-opus YOUR_ANTHROPIC_KEY
+
+# Or specify provider explicitly
+tex config my-model YOUR_KEY --provider google
+
+# Select active model
+tex select gemini-2.5-flash
+
+# Use it
+tex "explain quantum computing"
 ```
 
-This will create the `models_api.json` under `~/.config/ai_model_manager/` with default entries.
+## Commands
 
----
+```bash
+tex "your question"                  # Ask a question
+tex chat <text>                      # Chat mode
+tex debug                            # Debug bash commands
+tex config <model> <api_key>         # Configure model (auto-detects provider)
+tex config <model> <key> --provider <provider>  # Specify provider explicitly
+tex list                             # List models
+tex select <model>                   # Select active model
+tex remove <model>                   # Remove model
+```
 
-### Install the Editable Version (For Development)
+## Supported Providers
 
-If you want to modify or contribute to Vertex CLI, install it in **editable mode**:
+- **Google Gemini**: `google` or `gemini`
+- **OpenAI**: `openai`
+- **Anthropic**: `anthropic` or `claude`
 
-1. **Clone the repository:**
+## Configuration
 
-   ```bash
-   git clone https://github.com/Prtm2110/Vertex-CLI
-   cd Vertex-CLI
-   ```
+Models are configured in `~/.config/ai_model_manager/models_config.json`
 
-2. **Install dependencies and set up the project:**
+Example configuration:
+```json
+{
+  "selected_model": "gemini-2.5-flash",
+  "models": {
+    "gemini-2.5-flash": {
+      "provider": "google",
+      "api_key": "your-api-key",
+      "temperature": 0.7
+    }
+  }
+}
+```
 
-   ```bash
-   pip install -e .
-   ```
+## Documentation
 
-3. **Initialize the CLI:**
+- [Architecture](docs/ARCHITECTURE.md) - Technical architecture
 
-   ```bash
+## Requirements
+
+- Python 3.8+
+- LangChain and provider packages
+
+## License
+
+See [LICENSE](LICENSE) file.
    tex-init
    ```
 

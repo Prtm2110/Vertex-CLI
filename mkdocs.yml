@@ -42,6 +42,7 @@ plugins:
 
 nav:
   - Home: index.md
+  - Architecture: ARCHITECTURE.md
   - CLI Tool Guide: cli_tool_docs.md
   - Contributors Guide: contributors_guide.md
   - API Reference: references.md

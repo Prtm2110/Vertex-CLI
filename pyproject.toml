@@ -14,14 +14,13 @@ dependencies = [
     "langchain-anthropic>=0.1.0",
     "langchain-core>=0.1.0",
 ]
-license = { text = "BSD License" }
+license = "BSD-3-Clause"
 requires-python = ">=3.10"
 keywords = ["CLI", "AI", "LLM", "LangChain", "chatbot", "gemini", "openai", "anthropic"]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
     "Intended Audience :: Science/Research",
-    "License :: OSI Approved :: BSD License",
     "Operating System :: POSIX :: Linux",
     "Operating System :: MacOS",
     "Operating System :: Microsoft :: Windows",
@@ -48,6 +47,9 @@ tex-init = "cli.utils:install_requirements"
 [build-system]
 requires = ["setuptools>=42", "wheel"]
 build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["cli*", "config*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

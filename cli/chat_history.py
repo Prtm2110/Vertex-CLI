@@ -32,9 +32,7 @@ class ChatHistory:
         self._save()
 
     def get_prompt(self) -> str:
-        return "".join(
-            f"{item['role'].capitalize()}: {item['content']}\n" for item in self.history
-        )
+        return "".join(f"{item['role'].capitalize()}: {item['content']}\n" for item in self.history)
 
     def _save(self):
         with open(self.path, "w") as f:

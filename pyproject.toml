@@ -1,29 +1,41 @@
 [project]
 name = "Vertex-CLI"
-version = "0.1.41"
-description = "A CLI tool for debugging and generating AI outputs based on prompts"
+version = "0.1.43"
+description = "A unified CLI tool for interacting with multiple LLMs via LangChain"
 readme = "README.md"
 authors = [
     { name = "Pratham Hole", email = "prathamhole@gmail.com" }
 ]
 dependencies = [
-    "rich==14.0.0",
+    "rich>=14.0.0",
+    "langchain>=0.1.0",
+    "langchain-google-genai>=1.0.0",
+    "langchain-openai>=0.0.5",
+    "langchain-anthropic>=0.1.0",
+    "langchain-core>=0.1.0",
 ]
-license = { text = "BSD License" }
-keywords = ["CLI", "AI", "debugging", "prompt"]
+license = "BSD-3-Clause"
+requires-python = ">=3.10"
+keywords = ["CLI", "AI", "LLM", "LangChain", "chatbot", "gemini", "openai", "anthropic"]
 classifiers = [
-    "Development Status :: 1 - Planning",
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
     "Intended Audience :: Science/Research",
-    "License :: OSI Approved :: BSD License",
     "Operating System :: POSIX :: Linux",
-    "Programming Language :: Python :: 3.9",
+    "Operating System :: MacOS",
+    "Operating System :: Microsoft :: Windows",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
-    "Programming Language :: Python :: 3.12"
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
 ]
 [project.urls]
 Homepage = "https://github.com/Prtm2110/Vertex-CLI"
 Repository = "https://github.com/Prtm2110/Vertex-CLI"
+Documentation = "https://prtm2110.github.io/Vertex-CLI/"
 
 [project.optional-dependencies]
 dev = ["twine", "build", "mkdocs-material", "mkdocs-material[imaging]", "mkdocstrings", "mkdocstrings-python"]
@@ -35,3 +47,97 @@ tex-init = "cli.utils:install_requirements"
 [build-system]
 requires = ["setuptools>=42", "wheel"]
 build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["cli*", "config*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "-v",
+    "--strict-markers",
+    "--tb=short",
+    "--cov=cli",
+    "--cov-report=term-missing",
+    "--cov-report=html",
+    "--cov-report=xml",
+]
+markers = [
+    "unit: Unit tests that don't require external services",
+    "integration: Integration tests that may require external services",
+    "slow: Tests that take a long time to run",
+]
+
+[tool.coverage.run]
+source = ["cli"]
+omit = [
+    "*/tests/*",
+    "*/__pycache__/*",
+    "*/site-packages/*",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+    "class .*\\bProtocol\\):",
+    "@(abc\\.)?abstractmethod",
+]
+
+[tool.black]
+line-length = 100
+target-version = ["py310", "py311", "py312", "py313", "py314"]
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  # directories
+  \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | build
+  | dist
+)/
+'''
+
+[tool.isort]
+profile = "black"
+line_length = 100
+multi_line_output = 3
+include_trailing_comma = true
+force_grid_wrap = 0
+use_parentheses = true
+ensure_newline_before_comments = true
+
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = false
+disallow_incomplete_defs = false
+check_untyped_defs = true
+disallow_untyped_calls = false
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+strict_equality = true
+
+[[tool.mypy.overrides]]
+module = [
+    "langchain.*",
+    "langchain_google_genai.*",
+    "langchain_openai.*",
+    "langchain_anthropic.*",
+    "rich.*",
+]
+ignore_missing_imports = true

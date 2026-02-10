@@ -1,0 +1,29 @@
+{
+    "selected_model": null,
+    "models": {
+        "gemini-2.5-flash": {
+            "provider": "google",
+            "api_key": null,
+            "temperature": 0.7,
+            "max_tokens": null
+        },
+        "gemini-2.0-flash": {
+            "provider": "google",
+            "api_key": null,
+            "temperature": 0.7,
+            "max_tokens": null
+        },
+        "gpt-4": {
+            "provider": "openai",
+            "api_key": null,
+            "temperature": 0.7,
+            "max_tokens": null
+        },
+        "claude-3-opus": {
+            "provider": "anthropic",
+            "api_key": null,
+            "temperature": 0.7,
+            "max_tokens": null
+        }
+    }
+}

@@ -1,7 +1,60 @@
+# API Keys and Config
 models_api.json
+models_config.json
+
+# Python
 __pycache__/
-*.pyc
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Build and Distribution
 build/
 dist/
-Vertex_CLI.egg-info/
-.cache/*
+*.egg-info/
+*.egg
+MANIFEST
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+coverage.xml
+*.cover
+.hypothesis/
+
+# Code Quality
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.ruff_cache/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Environment
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Cache
+.cache/
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Documentation
+site/
